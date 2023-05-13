@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./app/dev
+    command: python manage.py run -h 0.0.0.0
+    volumes:
+      - ./app/dev/:/app/
+    ports:
+      - 5000:5000
+    env_file:
+      - ./.env.dev
