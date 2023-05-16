@@ -1,1 +1,4 @@
 Flask==2.3.2
+Flask-SQLAlchemy==3.0.2
+psycopg2-binary
+git+https://github.com/merge-api/merge-accounting-python.git

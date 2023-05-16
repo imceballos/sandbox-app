@@ -1,14 +1,14 @@
 FROM python:3.11.1-slim
 
 RUN mkdir -p /usr/src/app
+RUN pip install --upgrade pip
+RUN apt-get update && apt-get install -y netcat
 WORKDIR /usr/src/app
 
 ENV TZ=America/Santiago
 
-COPY ./src /usr/src/app
-COPY ./requirements.txt /usr/src/app/requirements.txt
+COPY . /usr/src/app
 
-RUN pip install --upgrade -r requirements.txt
+RUN pip install -r requirements.txt
 
-CMD ["gunicorn", "--bind=0.0.0.0:5000", "--workers=4", "manage:app"]
-
+ENTRYPOINT ["./entrypoint.sh"]
