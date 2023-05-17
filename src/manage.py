@@ -1,6 +1,7 @@
 from flask.cli import FlaskGroup
-
-from main import app, db
+from flask_sqlalchemy import SQLAlchemy
+from main.blueprints.main_route import app
+from main import db
 
 
 cli = FlaskGroup(app)

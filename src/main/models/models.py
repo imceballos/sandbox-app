@@ -1,4 +1,9 @@
-from . import db
+import graphene
+from graphene import relay
+from graphene_sqlalchemy import SQLAlchemyObjectType,  SQLAlchemyConnectionField
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = "users"
@@ -35,3 +40,14 @@ class User(db.Model):
         self.remote_was_deleted = remote_was_deleted
         self.modified_at = modified_at
         self.remote_data = remote_data
+
+class SchemaUsers(SQLAlchemyObjectType):
+    class Meta:
+        model = User
+        interfaces = (relay.Node,)
+
+class Query(graphene.ObjectType):
+    node = relay.Node.Field()
+    users = SQLAlchemyConnectionField(SchemaUsers.connection)
+
+schema = graphene.Schema(query=Query)

@@ -1,4 +1,7 @@
 Flask==2.3.2
 Flask-SQLAlchemy==3.0.2
 psycopg2-binary
+graphene
+graphene_sqlalchemy
+Flask-GraphQL
 git+https://github.com/merge-api/merge-accounting-python.git
