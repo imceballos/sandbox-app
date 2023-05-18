@@ -20,12 +20,15 @@ class User(db.Model):
     account_number = db.Column(db.String(128))
     parent_account = db.Column(db.String(128))
     company = db.Column(db.String(128))
-    remote_was_deleted = db.Column(db.Boolean())
+    remote_was_deleted = db.Column(db.Boolean)
     modified_at = db.Column(db.String(128))
     remote_data = db.Column(db.String(128))
 
 
-    def __init__(self, remote_id, name, description, classification, type, status):
+    def __init__(self, remote_id, name, description, classification, type, 
+        status, current_balance, currency, account_number, parent_account, company, 
+        remote_was_deleted, modified_at, remote_data):
+
         self.remote_id = remote_id
         self.name = name
         self.description = description
@@ -49,5 +52,37 @@ class SchemaUsers(SQLAlchemyObjectType):
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
     users = SQLAlchemyConnectionField(SchemaUsers.connection)
+    user_by_name = graphene.Field(List(SchemaUsers), name=String())
+
+    def resolve_user_by_name(self, info, name):
+        return User.query.filter_by(name=name).all()
 
 schema = graphene.Schema(query=Query)
+
+class Transaction(db.Model):
+    __tablename__ = "transactions"
+    id = db.Column(db.String(128), primary_key=True) 
+    transaction_type = db.Column(db.String(128))
+    remote_id = db.Column(db.String(128))
+    remote_data = db.Column(db.String(128))
+    number = db.Column(db.String(128))
+    transaction_date = db.Column(db.String(128))
+    account = db.Column(db.String(128))
+    contact = db.Column(db.String(128))
+    total_amount = db.Column(db.String(128))
+    currency = db.Column(db.String(128))
+    remote_was_deleted = db.Column(db.Boolean)
+
+    def __init__(self, transaction_type, remote_id, remote_data, number, transaction_date, 
+                account, contact, total_amount, currency, remote_was_deleted):
+        
+        self.transaction_type = transaction_type
+        self.remote_id = remote_id
+        self.remote_data = remote_data
+        self.number = number
+        self.transaction_date = transaction_date
+        self.account = account
+        self.contact = contact
+        self.total_amount = total_amount
+        self.currency = currency
+        self.remote_was_deleted = remote_was_deleted
