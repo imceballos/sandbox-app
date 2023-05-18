@@ -21,23 +21,23 @@ configuration.api_key['tokenAuth'] = 'kVZXEiHb1eEsmJEuCXGXatSur9ip8Q_mSM_2P8_ddR
 configuration.api_key_prefix['tokenAuth'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with MergeAccountingClient.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = accounts_api.AccountsApi(api_client)
-    cursor_next = cursor = "cj0xJnA9MjAyMy0wNS0xMiswMiUzQTQ1JTNBMDEuMTQ2ODU1JTJCMDAlM0EwMA==" # str | The pagination cursor value. (optional)
-    x_account_token = "tFz5hvTIO9zAs-UGjPV8vqM4_O6sOA8EeNWcQte0JCr1tWzncDG3TA" # str | Token identifying the end user.
-    all_data = []
-    output =  open("file.txt", "w")
-    while cursor_next:
-        try:
-            api_response = api_instance.accounts_list(x_account_token, cursor=cursor_next)
-            print("Hello")
-            all_data = all_data + api_response['results']
-            cursor_next = api_response["previous"]
-        except MergeAccountingClient.ApiException as e:
-            print("Exception when calling AccountsApi->accounts_list: %s\n" % e)
+def get_accounts():
+    with MergeAccountingClient.ApiClient(configuration) as api_client:
+        # Create an instance of the API class
+        api_instance = accounts_api.AccountsApi(api_client)
+        cursor_next = cursor = "cj0xJnA9MjAyMy0wNS0xMiswMiUzQTQ1JTNBMDEuMTQ2ODU1JTJCMDAlM0EwMA==" # str | The pagination cursor value. (optional)
+        x_account_token = "tFz5hvTIO9zAs-UGjPV8vqM4_O6sOA8EeNWcQte0JCr1tWzncDG3TA" # str | Token identifying the end user.
+        all_elements = []
+        while cursor_next:
+            try:
+                api_response = api_instance.accounts_list(x_account_token, cursor=cursor_next)
+                results = api_response['results']
+                cursor_next = api_response["previous"]
+                for element in results:
+                    all_elements.append(element)
+            except MergeAccountingClient.ApiException as e:
+                print("Exception when calling AccountsApi->accounts_list: %s\n" % e)
 
-        # example passing only required values which don't have defaults set
-        # and optional values
-
-    output.write(str(all_data))
+            # example passing only required values which don't have defaults set
+            # and optional values
+        return all_elements

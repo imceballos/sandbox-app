@@ -4,4 +4,4 @@ psycopg2-binary
 graphene
 graphene_sqlalchemy
 Flask-GraphQL
-git+https://github.com/merge-api/merge-accounting-python.git
+MergeAccountingClient @ git+https://github.com/merge-api/merge-accounting-python.git
