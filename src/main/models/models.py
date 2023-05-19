@@ -1,5 +1,6 @@
 import graphene
 from graphene import relay
+from typing import List
 from graphene_sqlalchemy import SQLAlchemyObjectType,  SQLAlchemyConnectionField
 from flask_sqlalchemy import SQLAlchemy
 
@@ -25,10 +26,11 @@ class Account(db.Model):
     remote_data = db.Column(db.String(128))
 
 
-    def __init__(self, remote_id, name, description, classification, type, 
+    def __init__(self, id, remote_id, name, description, classification, type, 
         status, current_balance, currency, account_number, parent_account, company, 
         remote_was_deleted, modified_at, remote_data):
 
+        self.id = id
         self.remote_id = remote_id
         self.name = name
         self.description = description
@@ -52,10 +54,6 @@ class SchemaAccounts(SQLAlchemyObjectType):
 class QueryAccounts(graphene.ObjectType):
     node = relay.Node.Field()
     users = SQLAlchemyConnectionField(SchemaAccounts.connection)
-    user_by_name = graphene.Field(List(SchemaAccounts), name=String())
-
-    def resolve_user_by_name(self, info, name):
-        return Account.query.filter_by(name=name).all()
 
 schema = graphene.Schema(query=QueryAccounts)
 
@@ -95,9 +93,5 @@ class SchemaTransactions(SQLAlchemyObjectType):
 class QueryTransactions(graphene.ObjectType):
     node = relay.Node.Field()
     users = SQLAlchemyConnectionField(SchemaTransactions.connection)
-    user_by_name = graphene.Field(List(SchemaTransactions), name=String())
-
-    def resolve_user_by_name(self, info, name):
-        return Transaction.query.filter_by(name=name).all()
 
 schema1 = graphene.Schema(query=QueryTransactions)

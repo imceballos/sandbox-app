@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from main.blueprints.main_route import app
 from main import db
 from main.business.accounts import get_accounts
+from main.models.models import Account
 
 cli = FlaskGroup(app)
 
@@ -17,8 +18,14 @@ def create_db():
 
 @cli.command("seed_db")
 def seed_db():
-    db.session.add(User(email="michael@mherman.org"))
-    db.session.commit()
+    accounts = get_accounts()
+    for account in accounts:
+        instance_account = Account(account['id'], account['remote_id'], account['name'] ,account['description'], 
+              account['classification'], account['type'], account['status'], account['current_balance'],
+              account['currency'], account['account_number'], account['parent_account'],
+              account['company'], account['remote_was_deleted'], account['modified_at'], account['remote_data'])
+        db.session.add(instance_account)
+        db.session.commit()
 
 if __name__ == "__main__":
     cli()

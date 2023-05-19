@@ -17,9 +17,9 @@ app.add_url_rule(
 
 
 app.add_url_rule(
-    '/graphql',
+    '/graphql1',
     view_func=GraphQLView.as_view(
-        'graphql',
+        'graphql1',
         schema=schema,
         graphiql=True
     ),
