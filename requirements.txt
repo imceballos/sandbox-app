@@ -5,3 +5,4 @@ graphene
 graphene_sqlalchemy
 Flask-GraphQL
 MergeAccountingClient @ git+https://github.com/merge-api/merge-accounting-python.git
+Faker

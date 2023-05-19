@@ -3,6 +3,8 @@ from graphene import relay
 from typing import List
 from graphene_sqlalchemy import SQLAlchemyObjectType,  SQLAlchemyConnectionField
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, and_
+
 
 db = SQLAlchemy()
 
@@ -54,6 +56,12 @@ class SchemaAccounts(SQLAlchemyObjectType):
 class QueryAccounts(graphene.ObjectType):
     node = relay.Node.Field()
     users = SQLAlchemyConnectionField(SchemaAccounts.connection)
+    total_balance = graphene.Float(company_id=graphene.String())
+
+    def resolve_total_balance(self, info, company_id):
+        query = db.session.query(func.sum(Account.current_balance)).filter(Account.company == company_id)
+        total_balance = query.scalar()
+        return total_balance
 
 schema = graphene.Schema(query=QueryAccounts)
 
@@ -71,9 +79,10 @@ class Transaction(db.Model):
     currency = db.Column(db.String(128))
     remote_was_deleted = db.Column(db.Boolean)
 
-    def __init__(self, transaction_type, remote_id, remote_data, number, transaction_date, 
+    def __init__(self, id, transaction_type, remote_id, remote_data, number, transaction_date, 
                 account, contact, total_amount, currency, remote_was_deleted):
         
+        self.id = id
         self.transaction_type = transaction_type
         self.remote_id = remote_id
         self.remote_data = remote_data
@@ -93,5 +102,16 @@ class SchemaTransactions(SQLAlchemyObjectType):
 class QueryTransactions(graphene.ObjectType):
     node = relay.Node.Field()
     users = SQLAlchemyConnectionField(SchemaTransactions.connection)
+    transactions_between_dates = graphene.List(SchemaTransactions, account_id=graphene.String(), 
+                                               initial_date=graphene.String(), end_date=graphene.String())
+
+    def resolve_transactions_between_dates(self, info, account_id, initial_date, end_date):
+        transactions = Transaction.query.filter(and_(
+            Transaction.account == account_id,
+            Transaction.transaction_date >= initial_date,
+            Transaction.transaction_date <= end_date
+        )).all()
+        
+        return transactions
 
 schema1 = graphene.Schema(query=QueryTransactions)
