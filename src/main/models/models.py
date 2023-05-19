@@ -5,8 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class User(db.Model):
-    __tablename__ = "users"
+class Account(db.Model):
+    __tablename__ = "accounts"
 
     id = db.Column(db.String(128), primary_key=True) 
     remote_id = db.Column(db.String(128))
@@ -44,20 +44,20 @@ class User(db.Model):
         self.modified_at = modified_at
         self.remote_data = remote_data
 
-class SchemaUsers(SQLAlchemyObjectType):
+class SchemaAccounts(SQLAlchemyObjectType):
     class Meta:
-        model = User
+        model = Account
         interfaces = (relay.Node,)
 
-class Query(graphene.ObjectType):
+class QueryAccounts(graphene.ObjectType):
     node = relay.Node.Field()
-    users = SQLAlchemyConnectionField(SchemaUsers.connection)
-    user_by_name = graphene.Field(List(SchemaUsers), name=String())
+    users = SQLAlchemyConnectionField(SchemaAccounts.connection)
+    user_by_name = graphene.Field(List(SchemaAccounts), name=String())
 
     def resolve_user_by_name(self, info, name):
-        return User.query.filter_by(name=name).all()
+        return Account.query.filter_by(name=name).all()
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=QueryAccounts)
 
 class Transaction(db.Model):
     __tablename__ = "transactions"
@@ -86,3 +86,18 @@ class Transaction(db.Model):
         self.total_amount = total_amount
         self.currency = currency
         self.remote_was_deleted = remote_was_deleted
+
+class SchemaTransactions(SQLAlchemyObjectType):
+    class Meta:
+        model = Transaction
+        interfaces = (relay.Node,)
+
+class QueryTransactions(graphene.ObjectType):
+    node = relay.Node.Field()
+    users = SQLAlchemyConnectionField(SchemaTransactions.connection)
+    user_by_name = graphene.Field(List(SchemaTransactions), name=String())
+
+    def resolve_user_by_name(self, info, name):
+        return Transaction.query.filter_by(name=name).all()
+
+schema1 = graphene.Schema(query=QueryTransactions)
